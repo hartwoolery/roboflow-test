@@ -1,53 +1,34 @@
-from transformers import AutoModelForCausalLM, AutoProcessor
+from transformers import AutoProcessor, AutoModelForCausalLM
 from PIL import Image
 import torch
+import supervision as sv
+
+
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class FlorenceModelWrapper:
-    def __init__(self, model_name="microsoft/Florence-2-large-ft"):
+    def __init__(self, model_name="microsoft/Florence-2-large"):
         # Load the processor and model from Hugging Face
-        DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.modelmodel = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True).to(DEVICE)
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True).to(DEVICE)
         self.processor = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
-
-    def predict_image(self, image: Image):
-        """
-        Takes an input image and returns a classification prediction.
-        
-        :param image: PIL Image to be classified
-        :return: Dictionary containing classification label and score
-        """
+    
+    def predict_image(self, image: Image, task="<OD>", text = ""):
         # Preprocess the image
-        inputs = self.processor(images=image, return_tensors="pt")
-
-        # Perform inference
-        with torch.no_grad():
-            outputs = self.model(**inputs)
         
-        # Extract predictions
-        logits = outputs.logits
-        predicted_class_idx = logits.argmax(-1).item()
-        score = torch.softmax(logits, dim=-1)[0][predicted_class_idx].item()
-
-        # Get class label from model's config
-        class_label = self.model.config.id2label[predicted_class_idx]
+        prompt = task or text
         
-        return {"label": class_label, "score": score}
-
-    def predict_caption(self, image: Image):
-        """
-        Placeholder for caption generation, depending on model capabilities.
+        inputs = self.processor(text=prompt, images=image, return_tensors="pt").to(DEVICE)
+        generated_ids = self.model.generate(
+            input_ids=inputs["input_ids"],
+            pixel_values=inputs["pixel_values"],
+            max_new_tokens=1024,
+            num_beams=3
+        )
         
-        :param image: PIL Image for generating caption
-        :return: Dictionary with generated caption
-        """
-        # Assuming Florence-2 supports captioning, use similar preprocessing.
-        # Replace FlorenceForImageClassification with the caption model class as appropriate.
-        inputs = self.processor(images=image, return_tensors="pt")
-
-        with torch.no_grad():
-            outputs = self.model(**inputs)
+        task = task or "<OD>"
         
-        # This would be replaced with actual caption extraction based on the model's output format
-        caption = "Generated caption here"
+        generated_text = self.processor.batch_decode(generated_ids, skip_special_tokens=False)[0]
+        response = self.processor.post_process_generation(generated_text, task=task, image_size=image.size)
         
-        return {"caption": caption}
+        print(response)
+        return response #[task]

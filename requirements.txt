@@ -4,11 +4,12 @@ transformers   # For loading and using the Florence-2 model from Hugging Face
 torch            # PyTorch, required for running Florence-2 model
 Pillow        # Image processing library, useful for handling image inputs
 requests       # HTTP client library, for making requests to the API
-supervision     # detection 
-python-multipart
+supervision     # Detection processing
+
 
 #additional Florence2 utilities
 einops
+python-multipart
 
 #pip install -U transformers
 
