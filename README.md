@@ -9,6 +9,7 @@ uvicorn app.main:app --reload
 # HTTP Client Notebook Code
 ```
 %cd roboflow-test
+!pip install supervision
 
 import supervision as sv
 
