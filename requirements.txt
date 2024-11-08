@@ -1,16 +1,14 @@
-fastapi==0.95.2        # For creating the RESTful API
-uvicorn==0.22.0        # ASGI server to run the FastAPI app
-transformers==4.46.2   # For loading and using the Florence-2 model from Hugging Face
-torch==2.2             # PyTorch, required for running Florence-2 model
-Pillow==10.0.0         # Image processing library, useful for handling image inputs
-requests==2.31.0       # HTTP client library, for making requests to the API
+fastapi       # For creating the RESTful API
+uvicorn       # ASGI server to run the FastAPI app
+transformers   # For loading and using the Florence-2 model from Hugging Face
+torch            # PyTorch, required for running Florence-2 model
+Pillow        # Image processing library, useful for handling image inputs
+requests       # HTTP client library, for making requests to the API
+supervision     # detection 
+python-multipart
 
 #additional Florence2 utilities
-flash_attn==1.0.5
-timm==1.0.3 
-einops==0.8.0
+einops
 
-# Optional: dependencies for macOS image handling if needed
-# Only install if you encounter issues with Pillow on macOS
-# jpeg==8d
-# libtiff==4.0.3
+#pip install -U transformers
+
