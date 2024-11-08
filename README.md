@@ -6,7 +6,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-# Example Notebook Test Code
+# HTTP Client Notebook Code
 ```
 %cd roboflow-test
 
